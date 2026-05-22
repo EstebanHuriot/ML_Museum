@@ -5,7 +5,7 @@ class LinearRegression:
     
     VALID_SOLVERS = {"ne", "bgd", "sgd"}
 
-    def __init__(self, solver, learning_rate=None, n_iterations=None, epochs=None):
+    def __init__(self, solver, learning_rate=None, n_iterations=None):
         
         if solver not in self.VALID_SOLVERS:
             raise ValueError(f'{solver} not accepted, solver must be within {self.VALID_SOLVERS}')
@@ -13,7 +13,7 @@ class LinearRegression:
         self.solver = solver
         self.learning_rate = learning_rate
         self.n_iterations = n_iterations
-        self.epochs = epochs
+        self.theta = None
 
     def fit(self, X, y):
         
@@ -23,7 +23,9 @@ class LinearRegression:
         # normal equation
         if self.solver == 'ne':
             theta = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ y_b
-            return theta
+            
+            self.theta = theta
+            return self
         
         # batch gradient descent
         if self.solver  == 'bgd':  
@@ -34,16 +36,17 @@ class LinearRegression:
                 gradient = 2 / m * X_b.T @ (X_b @ theta - y_b)
                 theta = theta - gradient * self.learning_rate
 
-            return theta
+            self.theta = theta
+            return self
 
         # stochastic gradient descent
         if self.solver == 'sgd':
             theta = np.random.randn(X_b.shape[1], 1)
 
             m = len(X)
-            for epoch in range(self.epochs):
+            for epoch in range(self.n_iterations):
                 for i in range(m):
-                    random_index = np.random.randint(100)
+                    random_index = np.random.randint(m)
 
                     Xi = X_b[random_index:random_index+1]
                     yi = y_b[random_index:random_index+1]
@@ -51,7 +54,8 @@ class LinearRegression:
                     gradients = 2 * Xi.T.dot(Xi.dot(theta) - yi)
                     theta = theta - gradients * self.learning_rate
             
-            return theta
+            self.theta = theta
+            return self
 
         
     
