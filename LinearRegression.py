@@ -14,11 +14,42 @@ class LinearRegression:
         self.learning_rate = learning_rate
         self.n_iterations = n_iterations
         self.theta = None
+        self.valid_solvers = str(self.VALID_SOLVERS)
 
-    def fit(self, X, y):
+    def prepare_X(self, X):
+
+        X = np.asarray(X)
+        
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+
+        if X.ndim != 2:
+            raise ValueError("X must be 1D or 2D array")
         
         X_b = np.c_[np.ones((len(X), 1)),X]
-        y_b = np.reshape(y, (len(y), 1))
+
+        return X_b
+    
+    def prepare_y(self, y):
+
+        y = np.asarray(y)
+
+        if y.ndim == 1:
+            y = y.reshape(-1, 1)
+
+        if y.ndim != 2 or y.shape[1] != 1: # no multiple outputs pls
+            raise ValueError("y must be a 1D or 2D array")
+        
+        return y
+
+
+    def fit(self, X, y):
+
+        if len(X) != len(y):
+            raise ValueError("X and y must have the same number of samples")
+        
+        X_b = self.prepare_X(X)
+        y_b = self.prepare_y(y)
         
         # normal equation
         if self.solver == 'ne':
@@ -56,6 +87,19 @@ class LinearRegression:
             
             self.theta = theta
             return self
+        
+
+    def predict(self, X):
+
+        if self.theta is None:
+            raise ValueError("Model must be fitted before prediction")
+        
+        X_b = self.prepare_X(X)
+        
+        theta = self.theta
+        result = X_b @ theta
+        return result
+
 
         
     
