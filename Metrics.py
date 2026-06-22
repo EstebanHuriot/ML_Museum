@@ -1,4 +1,9 @@
 def r2(y, y_predict):
+
+    '''
+    The R² compares a model's squarred errors to the squarred dispersion around of the target around the mean.
+    The closer it is to 1 the more the model explains the variation of y.
+    '''
         
     if y.shape != y_predict.shape:
         raise ValueError('y and y_predict must have the same shape')
