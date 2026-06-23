@@ -99,7 +99,3 @@ class LinearRegression:
         theta = self.theta
         result = X_b @ theta
         return result
-
-
-        
-    

@@ -1,3 +1,5 @@
+import numpy as np
+
 def r2(y, y_predict):
 
     '''
@@ -16,3 +18,5 @@ def r2(y, y_predict):
     return r2
     
 
+def mean_squared_error(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
