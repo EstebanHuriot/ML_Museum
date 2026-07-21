@@ -3,12 +3,13 @@ import numpy as np
 
 class LogisticRegression:
     
-    def __init__(self, epsilon, learning_rate=None, n_iterations=None):
+    def __init__(self, epsilon = 1e-15, learning_rate=None, n_iterations=None):
         
         self.learning_rate = learning_rate
         self.n_iterations = n_iterations
         self.theta = None
-        self.epsilon = 1e-15
+        self.epsilon = epsilon
+        
 
     def prepare_X(self, X):
 
@@ -57,10 +58,10 @@ class LogisticRegression:
     
             p_pred = self.logistic(X_b @ theta)
 
-            cost = -(1 / m) * np.sum(y * np.log(p_pred + self.epsilon) + (1 - y) * np.log(1- p_pred + self.epsilon))
+            cost = -(1 / m) * np.sum(y_b * np.log(p_pred + self.epsilon) + (1 - y_b) * np.log(1- p_pred + self.epsilon))
             cost_history.append(cost)
 
-            gradient = (1 / m) * X_b.T @ (p_pred - y)
+            gradient = (1 / m) * X_b.T @ (p_pred - y_b)
 
             theta = theta - self.learning_rate * gradient
 
