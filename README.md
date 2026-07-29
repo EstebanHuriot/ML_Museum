@@ -1,14 +1,13 @@
 # ML_Museum
 
 My goal here is to gain a deeper understanding of machine learning by recreating different models from scratch. </br>
-This work is also largely based books such as Hands on Machine Learning with Scikit Learn, Keras and TensorFlow by Aurélien Géron and Quand la machine apprend by Yann LeCun.
+This work is also largely based on books such as 'Hands on Machine Learning with Scikit Learn, Keras and TensorFlow' by Aurélien Géron or 'Quand la machine apprend' by Yann LeCun.
 </br>
 </br>
 Each section combines:
 - intuitive explanations
 - mathematical foundations
 - experiments
-</br>
 </br>
 
 ## Structure
