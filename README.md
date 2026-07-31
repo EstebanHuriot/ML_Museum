@@ -11,9 +11,10 @@ Each section combines:
 </br>
 
 ## Structure
-
+```
 ML_Museum/
 ├── notebooks/   # Experiments and explanations
 ├── src/         # Models implemented from scratch, library-like code
 ├── images/      # Images used in notebooks
 └── requirements.txt
+```
