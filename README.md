@@ -12,5 +12,8 @@ Each section combines:
 
 ## Structure
 
-The exploratory work is located in `/notebooks`, while the more functional, reusable, library-like code is organized in `/src`.
-
+ML_Museum/
+├── notebooks/   # Experiments and explanations
+├── src/         # Models implemented from scratch, library-like code
+├── images/      # Images used in notebooks
+└── requirements.txt
