@@ -16,7 +16,7 @@ class Node:
 
 
 
-class DecisionTree:
+class DecisionTreeClassification:
 # Only Gini, no entropy atm
     def __init__(self, max_depth = 5, min_samples_split = 2):
         self.max_depth = max_depth
@@ -113,6 +113,9 @@ class DecisionTree:
 
         feature, treshold, cost = self.FindBestSplit(X, y)
 
+        if feature is None or treshold is None:
+            return Node(value=self.MostCommonClass(y))
+
         feature_values = X[:, feature]
 
         left_mask = feature_values <= treshold
@@ -139,7 +142,10 @@ class DecisionTree:
         node = self.root
 
         while node.value is None:
-            if x <= node.threshold:
+
+            feature_value = x[node.feature]
+
+            if feature_value <= node.threshold:
                 node = node.left
             else:
                 node = node.right
@@ -149,7 +155,11 @@ class DecisionTree:
 
     def predict(self, X):
 
-        X = np.asarray(X).reshape(-1)
+        X = np.asarray(X)
+
+        if X.ndim == 1:
+            X = X.reshape(1, -1)
+
         predictions = [self.predictOne(x) for x in X]
 
         return np.array(predictions)
