@@ -1,7 +1,5 @@
 import numpy as np
 
-
-
 class Node:
 # Both decision and leaf atm
     def __init__(self, feature=None, threshold=None, left=None, right=None, value=None):
@@ -14,11 +12,6 @@ class Node:
 
         # leaf
         self.value = value
-
-
-
-
-
 
 
 
@@ -47,7 +40,6 @@ class DecisionTree:
         return J
 
 
-
     def Gini(self, y: np.ndarray):
 
         values, counts = np.unique(y, return_counts=True)
@@ -74,6 +66,29 @@ class DecisionTree:
         return best_t, best_cost
 
 
+    def FindBestSplit(self, X, y):
+
+        best_feature= None
+        best_threshold = None
+        best_cost = np.inf
+
+        
+        for feature_idx in range(X.shape[1]):
+            feature_values = X[:,feature_idx]
+
+            if len(np.unique(feature_values)) < 2:
+                continue
+
+            threshold, cost = self.FindBestThreshold(feature_values, y)
+
+            if cost < best_cost:
+                best_feature = feature_idx
+                best_threshold = threshold
+                best_cost = cost
+
+        return best_feature, best_threshold, best_cost
+
+
     def MostCommonClass(self, y):
 
         values, counts = np.unique(y, return_counts=True)
@@ -82,9 +97,6 @@ class DecisionTree:
         return values[most_common_index]
 
     
-
-
-
     def MakeNode(self, X, y, depth = 0):
 
         X = np.array(X)
@@ -94,27 +106,50 @@ class DecisionTree:
             len(np.unique(y)) == 1 # nothing to divide
         or depth >= self.max_depth # stop at desired depth
         or len(y) < self.min_samples_split # min sample number
-        or len(np.unique(X)) < 2 # min number of unique X values
 
         ):
             value = self.MostCommonClass(y)
             return Node(value=value)
 
+        feature, treshold, cost = self.FindBestSplit(X, y)
 
-        
-        t, cost = self.FindBestThreshold(X, y)
+        feature_values = X[:, feature]
 
-        left_mask = X <= t
-        right_mask = X > t
+        left_mask = feature_values <= treshold
+        right_mask = feature_values > treshold
 
         left_node = self.MakeNode(X = X[left_mask], y = y[left_mask], depth = depth + 1)
         right_node = self.MakeNode(X = X[right_mask], y = y[right_mask], depth = depth + 1)
 
-        return Node(feature=0, threshold=t, left=left_node, right=right_node)
+        return Node(feature, threshold=treshold, left=left_node, right=right_node)
 
 
+    def fit(self, X, y):
+
+        X = np.array(X)
+        y = np.array(y)
+
+        self.root = self.MakeNode(X, y, depth=0)     
+
+        return self
 
 
-    
+    def predictOne(self, x):
+
+        node = self.root
+
+        while node.value is None:
+            if x <= node.threshold:
+                node = node.left
+            else:
+                node = node.right
+
+        return node.value
 
 
+    def predict(self, X):
+
+        X = np.asarray(X).reshape(-1)
+        predictions = [self.predictOne(x) for x in X]
+
+        return np.array(predictions)
