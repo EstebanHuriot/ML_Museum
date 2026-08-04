@@ -1,5 +1,9 @@
 import numpy as np
 
+# need to add hyperparameters and mostly    min_sampple_leaf
+# need to add a get depth method
+# need to add a print tree method
+
 class Node:
 # Both decision and leaf atm
     def __init__(self, feature=None, threshold=None, left=None, right=None, value=None):
@@ -16,7 +20,7 @@ class Node:
 
 
 
-class DecisionTreeClassification:
+class BaseDecisionTree:
 # Only Gini, no entropy atm
     def __init__(self, max_depth = 5, min_samples_split = 2):
         self.max_depth = max_depth
@@ -24,29 +28,28 @@ class DecisionTreeClassification:
         self.root = None    
 
 
+    def impurity(self, y):
+        raise NotImplementedError("Subclasses must implement the impurity method.") # different classes will use different impurity functions such as gini or mse
+
+    def leaf_value(self, y):
+        raise NotImplementedError("Subclasses must implement the impurity method.") # different methods to get leaf value wether its a regression or classifier
+
+
     def CostFunction(self, threshold, X: np.ndarray, y: np.ndarray):
 
         left = X <= threshold   
         right = X > threshold
 
-        G_left = self.Gini(y[left]) 
-        G_right = self.Gini(y[right]) 
+        G_left = self.impurity(y[left]) 
+        G_right = self.impurity(y[right]) 
 
         m = len(y)
         m_left = len(y[left]) 
         m_right = len(y[right]) 
 
         J = (m_left/m) * G_left + (m_right/m) * G_right # cost function of the threshold cf the notebook
+
         return J
-
-
-    def Gini(self, y: np.ndarray):
-
-        values, counts = np.unique(y, return_counts=True)
-        proportions = counts / len(y)
-
-        return 1 - np.sum(proportions ** 2)
-
 
     def FindBestThreshold(self, X, y):
 
@@ -108,29 +111,37 @@ class DecisionTreeClassification:
         or len(y) < self.min_samples_split # min sample number
 
         ):
-            value = self.MostCommonClass(y)
-            return Node(value=value)
+            return Node(value=self.leaf_value(y)) # return leaf value
 
-        feature, treshold, cost = self.FindBestSplit(X, y)
+        feature, threshold, cost = self.FindBestSplit(X, y)
 
-        if feature is None or treshold is None:
+        if feature is None or threshold is None:
             return Node(value=self.MostCommonClass(y))
 
         feature_values = X[:, feature]
 
-        left_mask = feature_values <= treshold
-        right_mask = feature_values > treshold
+        left_mask = feature_values <= threshold
+        right_mask = feature_values > threshold
 
         left_node = self.MakeNode(X = X[left_mask], y = y[left_mask], depth = depth + 1)
         right_node = self.MakeNode(X = X[right_mask], y = y[right_mask], depth = depth + 1)
 
-        return Node(feature, threshold=treshold, left=left_node, right=right_node)
+        return Node(feature, threshold=threshold, left=left_node, right=right_node) # return node data
 
 
     def fit(self, X, y):
 
         X = np.array(X)
         y = np.array(y)
+
+        if X.ndim == 1: # accepts (x,) shape
+            X = X.reshape(-1, 1)
+
+        if y.ndim != 1:
+            raise ValueError(f"y must have shape (n_samples,), but received {y.shape}.")
+
+        if len(X) != len(y): 
+            raise ValueError("X and y must contain the same number of samples.")
 
         self.root = self.MakeNode(X, y, depth=0)     
 
@@ -163,3 +174,33 @@ class DecisionTreeClassification:
         predictions = [self.predictOne(x) for x in X]
 
         return np.array(predictions)
+
+
+
+# thank you inheritance
+class DecisionTreeClassifier(BaseDecisionTree):
+
+    def impurity(self, y: np.ndarray):
+
+        values, counts = np.unique(y, return_counts=True)
+        proportions = counts / len(y)
+
+        return 1 - np.sum(proportions ** 2)
+
+    def leaf_value(self, y):
+        values, counts = np.unique(y, return_counts=True)
+        return values[np.argmax(counts)]
+
+
+
+class DecisionTreeRegressor(BaseDecisionTree):
+
+    def impurity(self, y: np.ndarray):
+
+        mean = np.mean(y)
+
+        return np.mean((y-mean)**2)
+
+    def leaf_value(self, y):
+        return np.mean(y)
+
