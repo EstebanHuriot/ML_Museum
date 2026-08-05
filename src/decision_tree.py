@@ -182,7 +182,7 @@ class BaseDecisionTree:
         if node is None:
             return
 
-        indentation = "|" + depth * "-"
+        indentation = "|    " * depth + "└──"
 
         # leaf
         if node.value is not None:
@@ -190,13 +190,13 @@ class BaseDecisionTree:
     
         # decision node
         else:
-            print(f'{indentation} decision: k is {node.feature}, t is {node.threshold}')
+            print(f'{indentation} decision: feature [{node.feature}] <= {node.threshold}')
 
 
 
-    def print_tree(self, model):
+    def print_tree(self):
 
-        if model.root is None:
+        if self.root is None:
             print("The tree is empty.")
             return
 
@@ -212,7 +212,7 @@ class BaseDecisionTree:
                 crawler(node.left, depth+1)
                 crawler(node.right, depth+1)    
 
-        crawler(model.root)
+        crawler(self.root)
 
 
 
