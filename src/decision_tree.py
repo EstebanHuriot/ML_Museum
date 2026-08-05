@@ -177,6 +177,46 @@ class BaseDecisionTree:
 
 
 
+    def print_node(self, node,  depth = 0):
+
+        if node is None:
+            return
+
+        indentation = "|" + depth * "-"
+
+        # leaf
+        if node.value is not None:
+            print(f'{indentation} leaf value:{node.value}')
+    
+        # decision node
+        else:
+            print(f'{indentation} decision: k is {node.feature}, t is {node.threshold}')
+
+
+
+    def print_tree(self, model):
+
+        if model.root is None:
+            print("The tree is empty.")
+            return
+
+        def crawler(node, depth=0):
+
+            if node is None:
+                return
+
+            self.print_node(node, depth)
+
+            # recursive swag
+            if node.value is None:
+                crawler(node.left, depth+1)
+                crawler(node.right, depth+1)    
+
+        crawler(model.root)
+
+
+
+
 # thank you inheritance
 class DecisionTreeClassifier(BaseDecisionTree):
 
