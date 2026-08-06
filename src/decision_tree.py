@@ -2,11 +2,12 @@ import numpy as np
 
 # need to add hyperparameters and mostly    min_sampple_leaf
 # need to add a get depth method
-# need to add a print tree method
 
 class Node:
 # Both decision and leaf atm
-    def __init__(self, feature=None, threshold=None, left=None, right=None, value=None):
+    def __init__(self, feature=None, threshold=None, left=None, right=None, value=None, depth=None):
+
+        self.depth = depth
 
         # decision node
         self.feature = feature
@@ -126,7 +127,7 @@ class BaseDecisionTree:
         left_node = self.MakeNode(X = X[left_mask], y = y[left_mask], depth = depth + 1)
         right_node = self.MakeNode(X = X[right_mask], y = y[right_mask], depth = depth + 1)
 
-        return Node(feature, threshold=threshold, left=left_node, right=right_node) # return node data
+        return Node(feature, threshold=threshold, left=left_node, right=right_node, depth=depth) # return node data
 
 
     def fit(self, X, y):
